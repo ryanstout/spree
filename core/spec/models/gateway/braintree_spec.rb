@@ -1,4 +1,4 @@
- #$:.unshift File.dirname(__FILE__) + '/../../'
+ $:.unshift File.dirname(__FILE__) + '/../../'
 require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe Gateway::Braintree do
@@ -89,12 +89,12 @@ describe Gateway::Braintree do
       @payment.log_entries.size.should == 1
       transaction = ::Braintree::Transaction.find(@payment.response_code)
       transaction.status.should == Braintree::Transaction::Status::Authorized
-      @payment.payment_source.capture(@payment) # as done in PaymentsController#fire
-      # transaction = ::Braintree::Transaction.find(@payment.response_code)
-      # transaction.status.should == Braintree::Transaction::Status::SubmittedForSettlement
-      # lambda do
-      #   @payment.payment_source.capture(@payment)
-      # end.should raise_error(Spree::GatewayError, "Cannot submit for settlement unless status is authorized. (91507)")
+      @payment.payment_source.capture(@payment) as done in PaymentsController#fire
+      transaction = ::Braintree::Transaction.find(@payment.response_code)
+      transaction.status.should == Braintree::Transaction::Status::SubmittedForSettlement
+      lambda do
+        @payment.payment_source.capture(@payment)
+      end.should raise_error(Spree::GatewayError, "Cannot submit for settlement unless status is authorized. (91507)")
     end
   end
 
@@ -144,9 +144,9 @@ describe Gateway::Braintree do
   end
   def credit_using_spree_interface
     @payment.log_entries.size.should == 1
-    @payment.source.credit(@payment) # as done in PaymentsController#fire
+    @payment.source.credit(@payment) as done in PaymentsController#fire
     @payment.log_entries.size.should == 2
-    #Let's get the payment record associated with the credit
+    Let's get the payment record associated with the credit
     @payment = @order.payments.last
     @payment.response_code.should match(/\A\w{6}\z/)
     transaction = ::Braintree::Transaction.find(@payment.response_code)
@@ -162,7 +162,7 @@ describe Gateway::Braintree do
     Spree::Config.set :auto_capture => true
     @payment.send(:create_payment_profile) if profile
     @payment.log_entries.size == 0
-    @payment.process! # as done in PaymentsController#create
+    @payment.process! as done in PaymentsController#create
     @payment.log_entries.size == 1
     @payment.response_code.should match /\A\w{6}\z/
     @payment.state.should == 'completed'
