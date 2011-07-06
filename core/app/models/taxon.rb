@@ -31,10 +31,10 @@ class Taxon < ActiveRecord::Base
   # Creates permalink based on .to_url method provided by stringx gem
   def set_permalink
     if parent_id.nil?
-      self.permalink = name.to_url if self.permalink.blank?
+      self.permalink = name.to_url.gsub(/\/$/, '') if self.permalink.blank?
     else
       parent_taxon = Taxon.find(parent_id)
-      self.permalink = [parent_taxon.permalink, (self.permalink.blank? ? name.to_url : self.permalink.split("/").last)].join('/')
+      self.permalink = [parent_taxon.permalink, (self.permalink.blank? ? name.to_url : self.permalink.split("/").last)].join('/').gsub(/\/$/, '')
     end
   end
 
